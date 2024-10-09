@@ -1,1 +1,12 @@
-Prova git hub 
+La cartella GitHub contiene i seguenti elementi:
+
+1. **README.md**: Un file di testo che fornisce una panoramica del progetto, istruzioni su come installare e utilizzare il software, e altre informazioni utili.
+2. **src/**: Una cartella che contiene il codice sorgente del progetto.
+3. **docs/**: Una cartella che contiene la documentazione del progetto.
+4. **tests/**: Una cartella che contiene i test automatizzati per il progetto.
+5. **.gitignore**: Un file che specifica quali file e cartelle devono essere ignorati da Git.
+6. **LICENSE**: Un file che specifica i termini di licenza del progetto.
+7. **config/**: Una cartella che contiene file di configurazione per il progetto.
+8. **scripts/**: Una cartella che contiene script utili per automatizzare varie attività.
+
+Questi sono i componenti tipici che potresti trovare in una cartella di un repository GitHub.
