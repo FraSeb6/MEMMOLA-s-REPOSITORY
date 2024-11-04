@@ -1,18 +1,26 @@
 import sys
 
 # use of lists
-items = [1, 2, 3, 4, 5, 6]
+items = [1, 2, 3, 4, 5, 6]          # list of integers, created with the square brackets []
 # alternative syntax
-items = list((1, 2, 3, 4, 5, 6))
+items = list((1, 2, 3, 4, 5, 6))    # list of integers, created from a tuple with the list() function
 print(items)
 
 # example with strings
 items = ["summer", "autumn", "winter"]
-print(len(items))
-print(items[0])
+print(len(items))                   # length of the list     
+print(items[0])                     # access the first element
 
-items.append("spring")
+items.append("spring")              # add an element at the end of the list   
 print(len(items))
+"""
+A list can contain any type of character: strings or integers
+
+    In the last code we printed the length (function `len()` returning the length of an object) of the list ‘items’ 
+    and the first item ([0])of the list, 
+    and then we added a new element to the list (`’spring’`)
+
+"""
 
 # iterate over the list
 for i in items:
