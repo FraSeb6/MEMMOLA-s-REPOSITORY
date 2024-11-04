@@ -112,7 +112,9 @@ else:
     Though we could do it differently in Python:
 """
 #instead of the for loop we can calculate sum_modules
-sum_modules = sum([a*b for a,b in zip(grades, weights)])
+sum_modules = sum([a*b for a,b in zip(grades, weights)]) 
+#zip() is a built-in function that returns an iterator of tuples, where the first item in each passed iterator is paired together, 
+# and then the second item in each passed iterator are paired together etc.
 
 #in otder to understand better what zip does:
 wow= list(zip(grades, weights))

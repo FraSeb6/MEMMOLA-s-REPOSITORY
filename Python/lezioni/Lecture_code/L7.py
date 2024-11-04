@@ -89,7 +89,7 @@ print("the target is:" + target)
 
 print("Welcome to WORDLE!")
 print(f"Guess the target word, you have {max_attempts} tries.")
-
+print
 
 # list of previous attempts and colored guesses
 history = []
@@ -100,13 +100,16 @@ attempt = 1
 is_guessed = False
 
 # while loop: consider the number of attempts (that needs to be lower than the maximum)
-while (attempt <= max_attempts) and (not is_guessed):
+while (attempt <= max_attempts) and (not is_guessed) and (not is_stopped):
     #loop over hte input until a "rule-compliant" guess is inserted by the user
     # enter the guess
     is_input_ok=False
     while not is_input_ok:
         guess = input(f"Attempt number {attempt}. Insert a 5-letter word:")
         guess = guess.upper()
+        
+        if guess.lower() == "quit":
+            break
         # check possible errors in the attempt:
         # not in EN dict, not 5 letters, already in the history
         if len(guess) != 5:
@@ -138,5 +141,11 @@ while (attempt <= max_attempts) and (not is_guessed):
 
 # provide a feedback when the target is missed
 if is_guessed:
-    print(f"Congratulations! You guessed the target word {target} in {attempt-1} attempts.")
+    print(f"gooood! You guessed the target word {target} in {attempt-1} attempts!")
+elif guess == "quit":
+    print(f"Sorry, you missed the target word {target} in {max_attempts} attempts!")
+    print(f"The target word was {target}")
+    
+    
+    
 sys.exit()
