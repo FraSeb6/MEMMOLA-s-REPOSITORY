@@ -1,0 +1,137 @@
+
+
+/* select the movies of 2010 with length between 1 and 2 hours */
+db.movie.find(
+    {
+        "year": "2010",
+        "length": {
+            "$gte":60,
+            "$lte":120}
+    }
+);
+
+/*retrieve the movies with a duration/length greater than 120 and not belonging to 2010*/
+db.movie.find(
+{
+    "year": { "$ne":"2010"},
+    "length": {"$gte":120}
+}
+)
+
+/* alternative solution based on $and */
+db.movie.find(
+{
+    "$and":[
+        {"year":{"$ne":"2010"}},
+        {"length":{"$gte":120}}
+    ]
+})
+
+/*$and, $or*/
+/*retrieve the movies with length between 60 AND 120 minutes of duration OR year of production in 2010, 2022,2012*/
+/* the find command can have a second argument that is the filtering on the projection*/
+db.movie.find(
+    {
+        "$and":[
+            {"year":{"$ne":"2010"}},
+            {"length":{"$gte":120}}
+        ],
+        "year": "2010",
+        "year": "2011",
+        "year": "2012",
+    })
+
+    db.movie.find(
+    {
+        "$and":[
+            {"year":{"$ne":"2010"}},
+            {"length":{"$gte":120}}
+        ],
+        "year": {"$in":["2010", "2011","2012"]},
+    })
+
+db.movie.find(
+    {
+        "$or":[ //fillering
+        {"year": {"$in":["2010", "2011","2012"]}},
+        {"$and":[
+            {"year":{"$gte": 60}},
+            {"length":{"$lte":120}}
+        ]}
+        ]
+    },
+    {
+        "_id":0,
+        "title": 1,
+        "year":1,
+        "length":1,
+        "crew":0
+    }
+    )
+//sort the result of the previous command
+//docs are sorted according to the values of the year field in descending order (1)
+//when the year value is the same on two documents, the title is used for sorting in ascending order (-1)
+    db.movie.find(
+    {
+        "$or":[ //fillering
+        {"year": {"$in":["2010", "2011","2012"]}},
+        {"$and":[
+            {"year":{"$gte": 60}},
+            {"length":{"$lte":120}}
+        ]}
+        ]
+    },
+    {
+        "_id":0,
+        "title": 1,
+        "year":1,
+        "length":1,
+        "crew":0
+    }
+    ).sort({
+        "year": -1,
+        "title": 1
+    })
+/*retrieve the list of movies with Leonardo DiCaprio*/
+db.movie.find(
+    {
+        "crew.given_name": "Leonardo DiCaprio"
+    },
+    {
+        "_id": 0,
+        "title":1,
+        "crew.given_name.$":1
+    }
+    )
+
+//use of regular expressions for matching documents
+db.movie.find(
+{
+    "crew.given_name": {"$regex": /leonardo dicaprio/i}
+})
+
+db.movie.find(
+{
+    "crew.given_name": /leonardo di caprio/i
+})
+
+/* filtering with dates */
+/* retrive the docs with reviews on October 31st 2017*/
+db.movie.find(
+{
+    "rating.rating_date": new Date("2017-10-31") //it could be an error in sql nont in no sql
+})
+
+// get the movies that are rated in october 2017
+db.movie.find(
+{
+    "$and:"[
+        {"rating.rating_date": {"$gte":new Date("2017-10-01")}},
+        {"rating.rating_date":{ "$lte": new Date("2027-10-31")}}
+    ]
+    {
+        "_id":0,
+        "title":1,
+        "crew.give_name:$":1
+    }
+})
