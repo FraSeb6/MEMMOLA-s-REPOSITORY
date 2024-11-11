@@ -1,0 +1,130 @@
+
+
+// retrieve the movies that have not received any rating
+de.movie.find(
+    {
+        "rating": { "$exists": false }
+    }
+)
+
+
+// se ti ho fatto stare male ti chiedo scusa non era mia intenzione, facciamo pace? :D
+//questo fiore un poò mi ricorda te, 
+//spero le cose tornino come prima o migliorino
+
+/* consider that sometimes rating can be defined in a document with null*/
+de.movie.find(
+    {
+        "$or": [
+            { "rating": { "$exists": false } },
+            { "rating": null }
+        ]
+    }
+)
+
+de.movie.find(
+    {
+        "$or": [
+            { "rating": { "$exists": false } },
+            { "rating": null }
+        ]
+    },
+    {
+        "title": 1,
+        "rating": 1
+    }
+)
+
+/* retrieve the movies that have received at least one reviw (rating exists) */
+// consider the case of movies with ratings: null that have to be excluded
+db.movie.find(
+    {
+        "$and": [
+            { "rating": { "$exists": true } },
+            { "rating": { "$ne": null } }
+        ]
+    },
+    {
+        "title": 1,
+        "rating": 1
+    }
+)
+
+//retrieve the number of movies from 2010
+db.movie.find(
+    {
+        "year": 2010
+    }
+).count()
+
+
+//alternative solution with aggregation framework
+db.movie.aggregate(
+    [
+        {"$match": {"year": 2010}},
+        {"$group": {"_id": {$year}, "number_of_movies": {"$sum": 1}}}
+    ]
+)
+//retrieve the number of movies from 2010, second field is operator for summing up, but for counting we can use $sum: 1
+
+/*return the title and the year of the movies of 2010*/
+db.movie.find(
+    {
+        "year": 2010
+    },
+    {
+        "title": 1,
+        "year": 1
+    }
+)
+
+db.movie.aggregate(
+    [
+        {"$match": {"year": 2010}},
+        {"$project": {"_id": 0, "title": 1, "year": 1}}
+    ]
+)
+/*retrieve the number of movies by year*/
+/* the '$' beefore a field name indicates that the value of this fiels from incoming document will be considered in the operation. 
+In this example, $year means group by the values of the year field*/
+/*sort the result by year in ascending to the counts in descending order and sort by year 
+in ascending order when the counter are the same*/
+
+*/
+db.movie.aggregate(
+    [
+        {"$group": {"_id": "$year", "number_of_movies": {"$sum": 1}}},
+        {"$sort": {"numbeer_of_movies": 1}}
+    ]
+)
+
+/* movies from 2010: alternative solution, buat less efficient */
+db.movie.aggregate(
+    [
+        {"$group": {"_id": "$year", "number_of_movies": {"$sum": 1}}},
+        {"$match": {"_id": 2010}}
+    ]
+)
+
+/*retrieve the overall length of the movies with Leonardoo DiCaprio*/
+db.movie.aggregate(
+    [
+        {"$match": {"cast": "Leonardo DiCaprio"}},
+        {"$group": {"_id": null, "total_length": {"$sum": "$length"}}}
+    ]
+)
+
+/* retrieve the overall length of the movies with Leonardo DiCaprio, alternative solution */
+db.movie.aggregate(
+    [
+        {"$match": {"crew.given_name": "Leonardo DiCaprio"}},
+        {"$group": {"_id": "Leonardo DiCAprio", "overall_length": {"$sum": "$length"}}},
+        {"$project": {"_id": 0, "person_name":"Leonardo DiCaprio", "total_length": 1}}
+    ]
+)
+
+/*calculate the average length of the movies with Leonardo DiCaprio from sum and count
+(different result from avg. Why?)*/
+$sum: $length
+$sum:1 
+$divide: ["$sum", "$count"]
