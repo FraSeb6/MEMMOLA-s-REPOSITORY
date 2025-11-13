@@ -118,7 +118,7 @@ where movie.year between '1990' and '1999' and lower(genre.genre) = 'thriller';
 select *
 from imdb.movie, imdb.genre;
 
--- this is the the join between movie and genre
+-- this is the join between movie and genre
 -- join condition: movie.id = genre.movie
 select id, official_title
 from imdb.movie, imdb.genre
@@ -140,7 +140,7 @@ from imdb.movie inner join imdb.genre on movie.id = genre.movie;
 select distinct id, official_title, score/scale as "scaled score"
 from imdb.movie, imdb.rating
 where movie.id = rating.movie and score > 8 and scale = 10
-order by 2 desc;
+order by 3 desc;
 
 -- insert one more rating for the movie 0468569
 insert into imdb.rating(check_date, source, movie, scale, votes, score) values ('2024-10-02', 'SM', '0468569', 10, 1, 8.4);
