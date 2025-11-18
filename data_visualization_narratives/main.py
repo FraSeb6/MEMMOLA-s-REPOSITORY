@@ -71,3 +71,125 @@ frequenze = (
     .reset_index(name="count")
 )
 frequenze.head(20)
+
+# 4) Filtra il dataset originale per le tre specie richieste
+specie_interesse = [
+    "Pinus Contorta",
+    "Pinus Monticola",
+    "Pseudotsuga Menziesii",
+]
+
+# Prendiamo gli indici delle righe che (dopo normalizzazione) corrispondono a queste specie
+idx_specie = serie_norm[serie_norm.isin(specie_interesse)].index
+
+# Tabella uguale all'originale ma solo con le osservazioni delle tre specie
+df_tre_specie = df.loc[idx_specie].copy()
+
+print("\nRighe totali per le tre specie:", df_tre_specie.shape[0])
+
+# Mostra la tabella filtrata
+if display:
+    display(df_tre_specie)
+else:
+    print(df_tre_specie.head().to_string(index=False))
+
+# (Opzionale) Salva la tabella filtrata su CSV
+output_path = "raw_data_214_tre_specie.csv"
+df_tre_specie.to_csv(output_path, index=False)
+print("\nTabella filtrata salvata in:", output_path)
+
+import matplotlib.pyplot as plt
+import numpy as np
+
+# --- FILTRO PER LE TRE SPECIE DI INTERESSE (stessa logica di prima) ---
+specie_interesse = [
+    "Pinus Contorta",
+    "Pinus Monticola",
+    "Pseudotsuga Menziesii",
+]
+
+# Uso la serie normalizzata che hai già creato (serie_norm)
+idx_specie = serie_norm[serie_norm.isin(specie_interesse)].index
+
+# Sottoinsieme del dataset originale solo con le tre specie
+df_tre_specie = df.loc[idx_specie].copy()
+
+# --- CALCOLO DEL TREND DI ABBONDANZA NEL TEMPO ---
+# Sommo l'ABUNDANCE per anno e specie
+trend = (
+    df_tre_specie
+      .groupby(["YEAR", "valid_name"], as_index=False)["ABUNDANCE"]
+      .sum()
+      .sort_values("YEAR")
+)
+
+# --- PLOT: LONG-TERM TREE ABUNDANCE HISTOGRAM (BARPLOT) ---
+plt.figure(figsize=(12, 6))
+
+# Anni ordinati
+anni = sorted(trend["YEAR"].unique())
+x = np.arange(len(anni))
+
+# Specie presenti
+specie = trend["valid_name"].unique()
+n_specie = len(specie)
+
+# Larghezza delle barre (divido lo spazio dell'anno tra le specie)
+width = 0.8 / n_specie
+
+for i, sp in enumerate(specie):
+    sub = trend[trend["valid_name"] == sp]
+    # Mappo year -> abundance e costruisco la lista allineata a "anni"
+    mappa = dict(zip(sub["YEAR"], sub["ABUNDANCE"]))
+    y = [mappa.get(a, 0) for a in anni]
+
+    # Offset orizzontale per non sovrapporre le barre
+    offset = (i - (n_specie - 1) / 2) * width
+    plt.bar(x + offset, y, width, label=sp)
+
+plt.xlabel("Year")
+plt.ylabel("Total abundance (sum of ABUNDANCE)")
+plt.title("Long-term tree abundance histogram per year and species")
+plt.xticks(x, anni, rotation=45)
+plt.legend()
+plt.tight_layout()
+
+plt.show()
+
+# --- PLOT MENSILE PER PINUS CONTORTA DAGLI ANNI '70 IN POI ---
+# Filtra solo Pinus contorta (usando una normalizzazione semplice del nome)
+df_pinus = df_tre_specie[
+    df_tre_specie["valid_name"].astype(str).str.strip().str.title() == "Pseudotsuga Menziesii"
+].copy()
+
+# Tieni solo le osservazioni dagli anni '70 in poi (YEAR >= 1970)
+df_pinus = df_pinus[df_pinus["YEAR"] >= 1970].copy()
+
+# Costruisci una variabile year_month (usiamo il giorno 1 per tutti i mesi)
+df_pinus["year_month"] = pd.to_datetime(
+    {
+        "year": df_pinus["YEAR"].astype(int),
+        "month": df_pinus["MONTH"].astype(int),
+        "day": 1,
+    },
+    errors="coerce",
+)
+
+# Raggruppa per mese e somma l'ABUNDANCE
+trend_mensile = (
+    df_pinus
+        .groupby("year_month", as_index=False)["ABUNDANCE"]
+        .sum()
+        .sort_values("year_month")
+)
+
+plt.figure(figsize=(12, 6))
+plt.plot(trend_mensile["year_month"], trend_mensile["ABUNDANCE"], marker="o")
+
+plt.xlabel("Year-Month")
+plt.ylabel("Total abundance (sum of ABUNDANCE)")
+plt.title("Monthly abundance trend for Pseudotsuga Menziesii (from 1970 onwards)")
+plt.xticks(rotation=45)
+plt.tight_layout()
+
+plt.show()
